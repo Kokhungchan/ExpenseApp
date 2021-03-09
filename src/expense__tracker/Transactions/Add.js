@@ -74,7 +74,7 @@ const Add = ({ navigation }) => {
           style={{
             fontWeight: '700',
             color: 'gray',
-            fontSize: '16'
+            fontSize: 16
           }}>Amount</Text>
         <Box
           justifyContent="space-between"
@@ -116,7 +116,7 @@ const Add = ({ navigation }) => {
           style={{
             fontWeight: '700',
             color: 'gray',
-            fontSize: '16',
+            fontSize: 16,
           }}>
             Expenses made for
           </Text>

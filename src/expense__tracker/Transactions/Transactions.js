@@ -1,14 +1,15 @@
-import React from "react";
-import { ImageBackground, SectionList, View, StyleSheet, Alert } from "react-native";
+import React, { useRef, useState } from "react";
+import { ImageBackground, SectionList, View, StyleSheet, Alert, TextInput, Keyboard } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { Picker } from "@react-native-picker/picker"
 import moment from "moment";
 import Animated from "react-native-reanimated";
 import { useValue, withTransition } from "react-native-redash";
-import { Ebg1 } from "../../../assets/images";
 import theme, { Box, Text } from "../../components/theme";
 import { Chart, AddIcon, Delete } from "../Svgs";
 import { LinearGradient } from 'expo-linear-gradient'
 import BottomSheet from 'reanimated-bottom-sheet';
+import { Icon } from 'react-native-elements'
 
 export const moneySign = "MYR";
 
@@ -17,19 +18,296 @@ import Expense from "./Expense";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTransaction } from "../../../store/actions/transactionActions";
 import Top from "./Top";
-import { all } from "@shopify/restyle";
+import { addTransaction } from "../../../store/actions/transactionActions";
 import { render } from "react-dom";
+import { categories } from "./Category"; 
 
 const Transactions = ({ navigation }) => {
   const { navigate } = navigation;
   const dispatch = useDispatch();
-
+  const [price, setPrice] = useState("");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const titleRef = useRef(null);
+  const sheetRef = useRef(null);
+  const categorySheetRef = useRef(null);
   const active = new Animated.Value(0);
   const transition = withTransition(active, { duration: 200 });
+  const { transactions } = useSelector((state) => state.trs);
 
   const onNavigate = () => {
     navigate("AddTransaction");
   };
+  const closeSheet = () => {
+    sheetRef.current.snapTo(2)
+  }
+  const closeCategorySheet = () => {
+    categorySheetRef.current.snapTo(1)
+  }
+  const openCategorySheet = () => {
+    Keyboard.dismiss();
+    categorySheetRef.current.snapTo(0);
+  }
+  const expandKeyboard = () => {
+    sheetRef.current.snapTo(0)
+  }
+  const onPop = () => {
+    const popAction = StackActions.pop(1);
+    navigation.dispatch(popAction);
+  };
+
+  const submitCategory = (id) => {
+    switch (id) {
+      case 0:
+        setCategory('Healthcare')
+        break;
+      case 1: 
+        setCategory('Car')
+        break;
+      case 2: 
+        setCategory('Food & Drink')
+        break;
+      case 3: 
+        setCategory('Travel')
+        break;
+      case 4: 
+        setCategory('Home')
+        break;
+      case 5: 
+        setCategory('Entertainment')
+        break;
+      case 6: 
+        setCategory('Transport')
+        break;
+      case 7: 
+        setCategory('Groceries')
+        break;
+      case 8: 
+        setCategory('Gifts')
+        break;
+      case 9: 
+        setCategory('Others')
+        break;
+      default: 
+        setCategory("");
+        break;
+    }
+    closeCategorySheet();
+  }
+
+  const onSubmit = () => {
+    const transaction = {
+      price,
+      title,
+      category
+    };
+
+    if (!price || !title || !category) return alert("Details Empty");
+
+    dispatch(addTransaction(transaction));
+    setPrice("");
+    setTitle("");
+    setCategory("");
+    closeSheet();
+    Keyboard.dismiss();
+  };
+
+  const renderCategoryContent = () => (
+    <View
+    style={{
+      backgroundColor: '#f0f4f5',
+      padding: 20,
+      height: "100%",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+    }}
+  >
+      <Text
+        style={{
+        fontWeight: '700',
+        color: 'gray',
+        fontSize: 16
+      }}>Select a category</Text>
+      <Box flexDirection="row" marginTop="s" flexWrap="wrap">
+      {categories.map((item, index) => (
+      <View key={index} style={{paddingBottom: 15}}>
+      <Icon
+      reverse
+      name={item.name}
+      type={item.type}
+      color={item.color}
+      value={item.value}
+      onPress={() => submitCategory(index)} />
+      <Text style={{fontSize: 8, textAlign:'center', marginTop: 3}}>
+        {item.category}
+      </Text>
+      </View>
+      ))
+      }
+        </Box>
+  </View>
+  );
+
+  const renderContent = () => (
+    <View
+      style={{
+        backgroundColor: 'white',
+        padding: 20,
+        height: "100%",
+      }}
+    >
+      <Box flexDirection="row" flexDirection="column" marginTop="s">
+        <Text
+          style={{
+            fontWeight: '700',
+            color: 'gray',
+            fontSize: 16
+          }}>Amount</Text>
+        <Box
+          justifyContent="space-between"
+          flexDirection="row"
+          alignItems="center"
+          borderBottomWidth={2}
+          paddingBottom="m"
+          marginTop="m"
+        >
+          <TextInput
+            placeholderTextColor={theme.colors.primary}
+            keyboardType="numbers-and-punctuation"
+            style={{
+              padding: 10,
+              fontSize: 30,
+              fontFamily: "SFBOLD",
+              width: "70%",
+            }}
+            onChangeText={(price) => setPrice(price)}
+            onFocus={expandKeyboard}
+            onSubmitEditing={() => titleRef.current.focus()}
+            defaultValue={price}
+          />
+          <Text 
+            style={{
+              fontWeight: '700',
+              color: "gray",
+              
+            }}>MYR</Text>
+        </Box>
+
+        <Box marginTop="xl" borderBottomWidth={2}>
+          <Text       
+          style={{
+            fontWeight: '700',
+            color: 'gray',
+            fontSize: 16,
+          }}>
+            Expenses made for
+          </Text>
+          <TextInput
+            ref={titleRef}
+            placeholderTextColor={theme.colors.primary}
+            defaultValue={title}
+            onFocus={expandKeyboard}
+            style={{
+              fontSize: 25,
+              fontFamily: "SFBOLD",
+              width: "80%",
+              marginTop: 20
+            }}
+            onChangeText={(title) => setTitle(title)}
+          />
+        </Box>
+        <Box marginTop="xl">
+          <Text       
+          style={{
+            fontWeight: '700',
+            color: 'gray',
+            fontSize: 16,
+          }}>
+            Category: {category}
+          </Text>
+          <TouchableOpacity onPress={openCategorySheet}>
+            <Box
+              borderRadius="l"
+              height={55}
+              marginTop='m'
+              backgroundColor="gray"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Text variant="title1" style={{color: 'gray'}}>Select Category</Text>
+            </Box>
+          </TouchableOpacity>
+        </Box>
+        <Box marginTop="xl">
+          <TouchableOpacity onPress={onSubmit}>
+            <Box
+              borderRadius="l"
+              height={55}
+              backgroundColor="primary"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Text variant="title1">Submit</Text>
+            </Box>
+          </TouchableOpacity>
+        </Box>
+      </Box>
+    </View>
+  );
+  const renderBottomHeader = () => (
+    <View
+      style={{
+        shadowColor: "#333333",
+        backgroundColor: "#ffffff",
+        shadowOffset: {width: -1, height:-3},
+        shadowRadius: 2,
+        shadowOpacity: 0.4,
+        paddingTop: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20
+      }}>
+      <View 
+        style={{
+          alignItems: 'center'
+        }}>
+        <View 
+          style={{
+            width: 40,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: '#00000040',
+            marginBottom: 10
+        }}/>
+      </View>
+    </View>
+  );
+
+  const renderCatBottomHeader = () => (
+    <View
+      style={{
+        shadowColor: "#333333",
+       
+        shadowOffset: {width: -1, height:-3},
+        
+        shadowOpacity: 0.4,
+        paddingTop: 20,
+
+      }}>
+      <View 
+        style={{
+          alignItems: 'center'
+        }}>
+        <View 
+          style={{
+            width: 40,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: '#00000040',
+            marginBottom: 10
+        }}/>
+      </View>
+    </View>
+  );
 
   const onDelete = (id) => {
     Alert.alert(
@@ -48,8 +326,6 @@ const Transactions = ({ navigation }) => {
     ),
     { cancelable: false }
   };
-
-  const { transactions } = useSelector((state) => state.trs);
 
   const DATA = Object.values(
     transactions.reduce((acc, item) => {
@@ -226,7 +502,7 @@ const Transactions = ({ navigation }) => {
                       onTap={() => {
                         active.setValue(index);
                       }}
-                      {...{ transition, index, onDelete, item, allDates}}
+                      {...{ transition, index, onDelete, item, allDates, categories}}
                     >
                       <Box
                         overflow="hidden"
@@ -253,8 +529,7 @@ const Transactions = ({ navigation }) => {
                   </Animated.View>
                 </Box>
               </Animated.View>
-            );
-            
+            );    
           }}
           renderSectionHeader={renderHeader}
           renderSectionFooter={renderFooter}
@@ -262,11 +537,28 @@ const Transactions = ({ navigation }) => {
         />
       </Box>
       <Box style={{ position: "absolute", right: 20, bottom: 50, zIndex: 4 }}>
-        <TouchableOpacity onPress={onNavigate}>
+        <TouchableOpacity onPress={() => sheetRef.current.snapTo(1)}>
           <AddIcon />
         </TouchableOpacity>
       </Box>
-
+      <BottomSheet
+        ref={sheetRef}
+        snapPoints={[770, 500, 0]}
+        initialSnap={2}
+        enabledGestureInteraction={true}
+        renderHeader={renderBottomHeader}
+        enabledContentGestureInteraction={false}
+        renderContent={renderContent}
+      />
+      <BottomSheet
+        ref={categorySheetRef}
+        snapPoints={[565, 0]}
+        initialSnap={1}
+        enabledGestureInteraction={true}
+        renderHeader={renderCatBottomHeader}
+        enabledContentGestureInteraction={false}
+        renderContent={renderCategoryContent}
+      />
     </ImageBackground>
   );
 };

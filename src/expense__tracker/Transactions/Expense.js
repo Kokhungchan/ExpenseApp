@@ -10,7 +10,9 @@ import { withTransition } from "react-native-redash";
 import theme, { Box, Text } from "../../components/theme";
 import { Delete } from "../Svgs";
 
-const Expense = ({ index, transition, onTap, onDelete, item, allDates }) => {
+import { Icon } from 'react-native-elements'
+
+const Expense = ({ index, transition, onTap, onDelete, item, categories }) => {
   const isActive = eq(transition, index);
   const activeTransition = withTransition(isActive, { duration: 200 });
 
@@ -40,17 +42,40 @@ const Expense = ({ index, transition, onTap, onDelete, item, allDates }) => {
             height={50}
             position="relative"
           >
-            <View style={[StyleSheet.absoluteFill, {}]}>
+            <View style={[StyleSheet.absoluteFill, {flexDirection: "row", justifyContent:'space-between'}]}>
+              <Animated.View      
+                  style={{
+                  width:'15%',
+                  flexDirection: "row",
+                  alignItems: "center",
+                  height: 50,
+                  padding: 10,
+                }}>
+              {categories.map((icon) => 
+                  item.category == icon.category ? (
+                    <Icon
+                    reverse
+                    key={icon}
+                    name={icon.name}
+                    type={icon.type}
+                    color={icon.color}
+                    size={14}
+                    >
+                    </Icon>
+                  ):(null)
+                )}
+              </Animated.View>
               <Animated.View
                 style={{
                   justifyContent: "space-between",
+                  width:'85%',
                   flexDirection: "row",
                   alignItems: "center",
                   height: 50,
                   padding: 15,
                 }}
               >
-                <Animated.Text>{item.title}</Animated.Text>
+                <Animated.Text>{item.title}</Animated.Text>       
                 <Animated.Text
                   style={{
                     opacity: hidePrice,
