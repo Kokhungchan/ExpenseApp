@@ -3,12 +3,13 @@ import { ADD_TRANSACTION, DELETE_TRANSACTION } from "./types";
 
 export const addTransaction = ({ title, price, category, addedtime, month }) => (dispatch) => {
   const id = Math.floor(Math.random() * 600000);
- 
+
+  const formatNumber = parseInt(price.replace(/[, ]+/g, ''));
   const newTransaction = {
     id,
     title,
     category,
-    price: +price,
+    price: +formatNumber,
     addedtime: mainTime(),
     month: getMonth(),
     year: getYear()

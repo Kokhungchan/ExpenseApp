@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Text } from "../../components/theme";
 import { Chart } from "../Svgs";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import moment from "moment";
+import { useNavigation } from '@react-navigation/native';
 
-const Top = () => {
+const Top = ( ) => {
+  const  navigation  = useNavigation();
   const dispatch = useDispatch();
   let monthNumber = (new Date().getMonth());
   let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -18,14 +21,23 @@ const Top = () => {
       .filter((price) => price < 0)
       .reduce((prev, cur) => (prev += cur), 0) * -1;
   const income = expense + balance;
+  const formatBalance = parseInt(balance.toString().replace(/,/g, '')).toLocaleString();
+  const formatIncome = parseInt(income.toString().replace(/,/g, '')).toLocaleString();
+  const formatExpense = parseInt(expense.toString().replace(/,/g, '')).toLocaleString();
 
+  const onNavigate = () => {
+    navigation.navigate("Stats");
+  };
   return (
     <Box paddingLeft="l" paddingRight="l" style={{ paddingTop: 40 }}>
-      <Box flexDirection="row" justifyContent="space-between">
+      <Box flexDirection="row" justifyContent="space-between" alignItems='center'>
         <Text variant="title" style={{ fontSize: 45, fontFamily: "RMedium" }}>
           {monthName}
         </Text>
-        {/* <Chart /> */}
+        <TouchableOpacity onPress={onNavigate}>
+          <Chart />
+        </TouchableOpacity>
+        
       </Box>
       <Box justifyContent="space-between" marginTop="m">
       <Text     
@@ -39,7 +51,7 @@ const Top = () => {
             fontFamily="SFSEMI"
             fontSize={30}
             color="white"
-            >MYR {' '}{balance}</Text>
+            >MYR {' '}{formatBalance}</Text>
       </Box>
       <Box 
         flexDirection='row'
@@ -73,7 +85,7 @@ const Top = () => {
             fontWeight="600"
             fontFamily="SFSEMI"
           >
-             MYR{' '}{expense}
+             MYR{' '}{formatExpense}
           </Text>
         </Box>
         <Box borderLeftColor="gray" borderLeftWidth="1" width='50%'>
@@ -94,7 +106,7 @@ const Top = () => {
             color="green"
             fontWeight="600"
           >
-            MYR{' '}{income}
+            MYR{' '}{formatIncome}
           </Text>
         </Box>
       </Box>

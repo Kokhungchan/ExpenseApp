@@ -35,9 +35,6 @@ const Transactions = ({ navigation }) => {
   const transition = withTransition(active, { duration: 200 });
   const { transactions } = useSelector((state) => state.trs);
 
-  const onNavigate = () => {
-    navigate("AddTransaction");
-  };
   const closeSheet = () => {
     sheetRef.current.snapTo(2)
   }
@@ -51,10 +48,6 @@ const Transactions = ({ navigation }) => {
   const expandKeyboard = () => {
     sheetRef.current.snapTo(0)
   }
-  const onPop = () => {
-    const popAction = StackActions.pop(1);
-    navigation.dispatch(popAction);
-  };
 
   const submitCategory = (id) => {
     switch (id) {
@@ -112,6 +105,130 @@ const Transactions = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
+  const onDelete = (id) => {
+    Alert.alert(
+      "Delete Transaction?",
+      "Your transactions will be lost if you confirm.",[
+        {
+          text: "Yes, delete transaction",
+          onPress: () => dispatch(deleteTransaction(id)),
+        },
+        {
+          text: "Cancel",
+          onPress: () => console.log("No, continue editing"),
+          style: "cancel"
+        }
+      ]
+    ),
+    { cancelable: false }
+  };
+
+  const DATA = Object.values(
+    transactions.reduce((acc, item) => {
+      if (!acc[item.addedtime])
+        acc[item.addedtime] = {
+          title: item.addedtime,
+          data: [],
+          price: item.price,
+        };
+      acc[item.addedtime].data.push(item);
+      return acc;
+    }, {})
+  );
+
+  /* Price calculations */
+  const allDates = transactions
+    .map(({ addedtime }) => addedtime)
+    .filter(function (value, index, array) {
+      return array.indexOf(value) == index;
+    });
+
+  const MonthExpense =({ monthly, yearly }) => {
+    const expense = transactions
+      .filter(({ month, year }) => month == monthly && year == yearly)
+      .map(({ price }) => {
+        return price;
+      });
+      const sum = eval(expense.join("+"));
+
+      return (
+        <Text color="silver1" fontSize={16} fontWeight="700">{sum > 0 ? `RM${sum}` : `- RM${Math.abs(sum)}`}</Text>
+      );
+  }
+
+  const Prices = ({ time }) => {
+    const prices = transactions
+      .filter(({ addedtime }) => addedtime == time)
+      .map(({ price }) => {
+        return price;
+      });
+    const sum = eval(prices.join("+"));
+
+    return (
+      <Text 
+        color="silver1">
+          {sum > 0 ? `MYR${sum}` : `- MYR${Math.abs(sum)}`}</Text>
+    );
+  };
+
+  const handlePrice = (event) => {
+    const { text } = event.nativeEvent
+    if (text){
+    // const retVal = text ? parseInt(text.replace(/,/g, '')) : 0;
+    // const formatNumber = retVal.toString().replace(/\B(?=(\d{3})+\b)/g, ",");
+    setPrice(text)
+    }
+  };
+
+  /* Render components */
+
+  const renderHeader = ({ section: { data } }) => {
+    return (
+      <Box
+        paddingHorizontal="m"
+        backgroundColor="white"
+        flexDirection="row"
+        justifyContent="space-between"
+        borderBottomWidth={1}
+        borderBottomColor="silver"
+        paddingBottom="s"
+        paddingTop="s"
+        marginTop="m"
+        borderTopRightRadius="m"
+        borderTopLeftRadius="m"
+      >
+        <Text color="silver1">
+          {moment(data[0].addedtime, "x").format("DD MMM YYYY")}
+        </Text>
+        <Prices time={data[0].addedtime} />
+      </Box>
+    );
+  };
+
+  const renderFooter = ({ section: { data } }) => {
+    return (
+      <Box
+        paddingHorizontal="m"
+        backgroundColor="white"
+        flexDirection="row"
+        justifyContent="space-between"
+        borderBottomWidth={1}
+        borderBottomColor="silver"
+        paddingBottom="s"
+        paddingTop="s"
+        borderBottomRightRadius="m"
+        borderBottomLeftRadius="m"
+      >
+      <Text 
+        color="silver1"
+        fontSize={16}>
+          Total this month ({moment(data[0].addedtime, "x").format("MMM")})
+      </Text>
+       <MonthExpense monthly={data[0].month} yearly={data[0].year}/>
+      </Box>
+    );
+  };
+
   const renderCategoryContent = () => (
     <View
     style={{
@@ -162,7 +279,8 @@ const Transactions = ({ navigation }) => {
             fontWeight: '700',
             color: 'gray',
             fontSize: 16
-          }}>Amount</Text>
+          }}>Amount
+        </Text>
         <Box
           justifyContent="space-between"
           flexDirection="row"
@@ -180,7 +298,7 @@ const Transactions = ({ navigation }) => {
               fontFamily: "SFBOLD",
               width: "70%",
             }}
-            onChangeText={(price) => setPrice(price)}
+            onChange={handlePrice}
             onFocus={expandKeyboard}
             onSubmitEditing={() => titleRef.current.focus()}
             defaultValue={price}
@@ -309,119 +427,6 @@ const Transactions = ({ navigation }) => {
     </View>
   );
 
-  const onDelete = (id) => {
-    Alert.alert(
-      "Delete Transaction?",
-      "Your transactions will be lost if you confirm.",[
-        {
-          text: "Yes, delete transaction",
-          onPress: () => dispatch(deleteTransaction(id)),
-        },
-        {
-          text: "Cancel",
-          onPress: () => console.log("No, continue editing"),
-          style: "cancel"
-        }
-      ]
-    ),
-    { cancelable: false }
-  };
-
-  const DATA = Object.values(
-    transactions.reduce((acc, item) => {
-      if (!acc[item.addedtime])
-        acc[item.addedtime] = {
-          title: item.addedtime,
-          data: [],
-          price: item.price,
-        };
-      acc[item.addedtime].data.push(item);
-      return acc;
-    }, {})
-  );
-
-  /* Price calculations */
-  const allDates = transactions
-    .map(({ addedtime }) => addedtime)
-    .filter(function (value, index, array) {
-      return array.indexOf(value) == index;
-    });
-
-  const MonthExpense =({ monthly, yearly }) => {
-    const expense = transactions
-      .filter(({ month, year }) => month == monthly && year == yearly)
-      .map(({ price }) => {
-        return price;
-      });
-      const sum = eval(expense.join("+"));
-
-      return (
-        <Text color="silver1" fontSize={16} fontWeight="700">{sum > 0 ? `RM${sum}` : `- RM${Math.abs(sum)}`}</Text>
-      );
-  }
-
-  const Prices = ({ time }) => {
-    const prices = transactions
-      .filter(({ addedtime }) => addedtime == time)
-      .map(({ price }) => {
-        return price;
-      });
-    const sum = eval(prices.join("+"));
-
-    return (
-      <Text 
-        color="silver1">
-          {sum > 0 ? `MYR${sum}` : `- MYR${Math.abs(sum)}`}</Text>
-    );
-  };
-
-  const renderHeader = ({ section: { data } }) => {
-    return (
-      <Box
-        paddingHorizontal="m"
-        backgroundColor="white"
-        flexDirection="row"
-        justifyContent="space-between"
-        borderBottomWidth={1}
-        borderBottomColor="silver"
-        paddingBottom="s"
-        paddingTop="s"
-        marginTop="m"
-        borderTopRightRadius="m"
-        borderTopLeftRadius="m"
-      >
-        <Text color="silver1">
-          {moment(data[0].addedtime, "x").format("DD MMM YYYY")}
-        </Text>
-        <Prices time={data[0].addedtime} />
-      </Box>
-    );
-  };
-
-  const renderFooter = ({ section: { data } }) => {
-    return (
-      <Box
-        paddingHorizontal="m"
-        backgroundColor="white"
-        flexDirection="row"
-        justifyContent="space-between"
-        borderBottomWidth={1}
-        borderBottomColor="silver"
-        paddingBottom="s"
-        paddingTop="s"
-        borderBottomRightRadius="m"
-        borderBottomLeftRadius="m"
-      >
-      <Text 
-        color="silver1"
-        fontSize={16}>
-          Total this month ({moment(data[0].addedtime, "x").format("MMM")})
-      </Text>
-       <MonthExpense monthly={data[0].month} yearly={data[0].year}/>
-      </Box>
-    );
-  };
-
   return (
     <ImageBackground 
       style={{
@@ -543,7 +548,7 @@ const Transactions = ({ navigation }) => {
       </Box>
       <BottomSheet
         ref={sheetRef}
-        snapPoints={[770, 500, 0]}
+        snapPoints={['95%', '70%', 0]}
         initialSnap={2}
         enabledGestureInteraction={true}
         renderHeader={renderBottomHeader}
@@ -552,7 +557,7 @@ const Transactions = ({ navigation }) => {
       />
       <BottomSheet
         ref={categorySheetRef}
-        snapPoints={[565, 0]}
+        snapPoints={['70%', 0]}
         initialSnap={1}
         enabledGestureInteraction={true}
         renderHeader={renderCatBottomHeader}
