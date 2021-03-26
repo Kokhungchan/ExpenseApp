@@ -11,6 +11,7 @@ export const addTransaction = ({ title, price, category, addedtime, month }) => 
     category,
     price: +formatNumber,
     addedtime: mainTime(),
+    date: getDate(),
     month: getMonth(),
     year: getYear()
   };
@@ -34,6 +35,14 @@ export const getYear = () => {
   var year = currentTime.getFullYear();
 
   return year; 
+}
+
+export const getDate = () => {
+  var currentTime = new Date();
+  var date = currentTime.getDate();
+
+  console.log(date)
+  return date;
 }
 
 export const mainTime = () => {

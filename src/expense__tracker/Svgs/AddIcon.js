@@ -1,6 +1,6 @@
 import * as React from "react";
 import { moderateScale } from "react-native-size-matters";
-import Svg, { Defs, G, Rect, Circle } from "react-native-svg";
+import Svg, { Defs, G, Rect, Circle, LinearGradient, Stop } from "react-native-svg";
 
 export default ({}) => {
   return (
@@ -11,17 +11,21 @@ export default ({}) => {
     >
       <Defs></Defs>
       <G data-name="Add transaction">
+      <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+          <Stop offset="0" stopColor="#5275c1" stopOpacity="1" />
+          <Stop offset="1" stopColor="#134698" stopOpacity="1" />
+        </LinearGradient>
         <G filter="url(#prefix__a)">
           <Circle
             data-name="Ellipse 2"
             cx={32}
             cy={32}
             r={32}
-            transform="translate(15 12)"
-            fill="#2a4a66"
+            transform="translate(0 0)"
+            fill="url(#grad)"
           />
         </G>
-        <G data-name="Group 5" fill="#fff" transform="translate(-276 -668)">
+        <G data-name="Group 5" fill="#fff" transform="translate(-292 -681)">
           <Rect
             data-name="Rectangle 5"
             width={3}

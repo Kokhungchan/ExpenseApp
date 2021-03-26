@@ -37,10 +37,13 @@ const Expense = ({ index, transition, onTap, onDelete, item, categories }) => {
           <Box
             overflow="hidden"
             paddingHorizontal="l"
-            borderBottomWidth={1}
+            borderBottomWidth={0}
             borderBottomColor="silver"
-            height={50}
+            height={80}
             position="relative"
+            style={{
+              borderBottomLeftRadius: 10
+            }}
           >
             <View style={[StyleSheet.absoluteFill, {flexDirection: "row", justifyContent:'space-between'}]}>
               <Animated.View      
@@ -48,18 +51,18 @@ const Expense = ({ index, transition, onTap, onDelete, item, categories }) => {
                   width:'15%',
                   flexDirection: "row",
                   alignItems: "center",
-                  height: 50,
+                  height: 80,
                   padding: 10,
                 }}>
               {categories.map((icon) => 
                   item.category == icon.category ? (
                     <Icon
-                    reverse
+                    raised
                     key={icon}
                     name={icon.name}
                     type={icon.type}
                     color={icon.color}
-                    size={14}
+                    size={20}
                     >
                     </Icon>
                   ):(null)
@@ -68,18 +71,27 @@ const Expense = ({ index, transition, onTap, onDelete, item, categories }) => {
               <Animated.View
                 style={{
                   justifyContent: "space-between",
-                  width:'85%',
+                  width:'81%',
                   flexDirection: "row",
                   alignItems: "center",
-                  height: 50,
+                  height: 80,
                   padding: 15,
                 }}
               >
-                <Animated.Text>{item.title}</Animated.Text>       
+                <Box style={{
+                  flexDirection:'column',
+                  alignItems:'flex-start',
+
+                }}>
+                  <Animated.Text style={{color: '#113D6B', fontWeight: '600', marginBottom: 4, fontSize: 16}}>{item.category}</Animated.Text> 
+                  <Animated.Text style={{color: '#64819F', fontSize: 12}}>{item.title}</Animated.Text>  
+                </Box>
+                     
                 <Animated.Text
                   style={{
                     opacity: hidePrice,
-                    color: item.price > 0 ? "#009BFC" : "#FF4500",
+                    fontWeight: '700',
+                    color: item.price > 0 ? "#34B27C" : "#FF4500",
                   }}
                 >
                   {item.price > 0
@@ -95,7 +107,7 @@ const Expense = ({ index, transition, onTap, onDelete, item, categories }) => {
                 color: "white",
                 fontWeight: "900",
                 position: "absolute",
-                height: 49,
+                height: 79,
                 width: "14%",
                 right: delX,
                 alignItems: "center",

@@ -10,6 +10,7 @@ import { Chart, AddIcon, Delete } from "../Svgs";
 import { LinearGradient } from 'expo-linear-gradient'
 import BottomSheet from 'reanimated-bottom-sheet';
 import { Icon } from 'react-native-elements'
+import { Ebg1 } from "../../../assets/images";
 
 export const moneySign = "MYR";
 
@@ -21,6 +22,7 @@ import Top from "./Top";
 import { addTransaction } from "../../../store/actions/transactionActions";
 import { render } from "react-dom";
 import { categories } from "./Category"; 
+import { scale } from "react-native-size-matters";
 
 const Transactions = ({ navigation }) => {
   const { navigate } = navigation;
@@ -152,7 +154,7 @@ const Transactions = ({ navigation }) => {
       const sum = eval(expense.join("+"));
 
       return (
-        <Text color="silver1" fontSize={16} fontWeight="700">{sum > 0 ? `RM${sum}` : `- RM${Math.abs(sum)}`}</Text>
+        <Text style ={{color: '#113D6B' }} fontSize={15} fontWeight="500">{sum > 0 ? `MYR${sum}` : `- MYR${Math.abs(sum)}`}</Text>
       );
   }
 
@@ -191,11 +193,13 @@ const Transactions = ({ navigation }) => {
         justifyContent="space-between"
         borderBottomWidth={1}
         borderBottomColor="silver"
-        paddingBottom="s"
-        paddingTop="s"
-        marginTop="m"
-        borderTopRightRadius="m"
-        borderTopLeftRadius="m"
+        paddingBottom="m"
+        paddingTop="m"
+        // marginTop='m'
+        style={{
+          borderTopRightRadius: 10,
+          borderTopLeftRadius: 10
+        }}
       >
         <Text color="silver1">
           {moment(data[0].addedtime, "x").format("DD MMM YYYY")}
@@ -205,27 +209,23 @@ const Transactions = ({ navigation }) => {
     );
   };
 
-  const renderFooter = ({ section: { data } }) => {
+  const renderFooter = () => {
     return (
       <Box
         paddingHorizontal="m"
         backgroundColor="white"
         flexDirection="row"
         justifyContent="space-between"
-        borderBottomWidth={1}
         borderBottomColor="silver"
-        paddingBottom="s"
-        paddingTop="s"
-        borderBottomRightRadius="m"
-        borderBottomLeftRadius="m"
-      >
-      <Text 
-        color="silver1"
-        fontSize={16}>
-          Total this month ({moment(data[0].addedtime, "x").format("MMM")})
-      </Text>
-       <MonthExpense monthly={data[0].month} yearly={data[0].year}/>
-      </Box>
+
+        marginBottom="m"
+
+        style={{
+          padding: 7,
+          borderBottomRightRadius: 10,
+          borderBottomLeftRadius: 10
+        }}
+      ></Box>
     );
   };
 
@@ -431,31 +431,30 @@ const Transactions = ({ navigation }) => {
     <ImageBackground 
       style={{
         flex: 1,
-        height: "100%",
-        justifyContent: "flex-end",
+        backgroundColor: '#EDEFF2',
+        height: "100%",  
+        justifyContent: "center",
         position: "relative",
       }}>
       <View
         style={{
-        height: "28%",
+        height: "25%",
         position: "absolute",
         top: 0,
         width: '100%',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
         overflow: 'hidden'
-      }}
-      >
-        <LinearGradient
-          colors={['#395e7e','#315472','#2a4a66','#22405a','#1b374f']}
+      }}>
+        <ImageBackground       
+          source={Ebg1}
+          resizeMode="cover"
           style={{
-            width: "100%",
-            height: "100%",
-          }}
-        />
+            flex: 1,
+            height: "350%"
+          }}></ImageBackground>
       </View>
       <Top />
-   
       <Box
         flex={1}
         paddingLeft="l"
@@ -466,22 +465,24 @@ const Transactions = ({ navigation }) => {
         <SectionList
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-          bounces={false}
+          bounces={true}
           keyExtractor={(item, index) => item + index}
           renderItem={({ item }) => {
             const index = item.id;
 
             return (
               <Animated.View
-                style={{ borderRadius: 20, height:51 }}
+                style={{ borderRadius: 20, height:80 }}
               >
                 <Box
                   overflow="hidden"
-                  borderBottomWidth={1}
-                  borderBottomColor="silver"
-                  height={50}
+                  borderTopWidth={1}
+                  height={80}
                   position="relative"
                   backgroundColor="white"
+                  style={{
+                    borderTopColor: '#F0F3F8'
+                  }}
                 >
                   <Animated.View
                     style={{
@@ -489,7 +490,7 @@ const Transactions = ({ navigation }) => {
                       color: "white",
                       fontWeight: "900",
                       position: "absolute",
-                      height: 50,
+                      height: 80,
                       width: "14%",
                       right: -20,
                       alignItems: "center",
@@ -514,7 +515,7 @@ const Transactions = ({ navigation }) => {
                         paddingHorizontal="m"
                         borderBottomWidth={1}
                         borderBottomColor="silver"
-                        height={50}
+                        height={80}
                         position="relative"
                         backgroundColor="white"
                       >
@@ -524,7 +525,7 @@ const Transactions = ({ navigation }) => {
                               justifyContent: "space-between",
                               flexDirection: "row",
                               alignItems: "center",
-                              height: 50,
+                              height: 80,
                               paddingHorizontal: theme.spacing.m,
                             }}
                           ></Animated.View>
@@ -541,8 +542,20 @@ const Transactions = ({ navigation }) => {
           sections={DATA}
         />
       </Box>
-      <Box style={{ position: "absolute", right: 20, bottom: 50, zIndex: 4 }}>
-        <TouchableOpacity onPress={() => sheetRef.current.snapTo(1)}>
+    
+      <Box style={{ position: "absolute", right: 20, bottom: 20, zIndex: 4 }}>
+        <TouchableOpacity 
+          style={{
+            width: 66,
+            height: 66,
+            shadowColor: "#D3D5D8",
+            borderRadius: 50,
+            backgroundColor: "#E2E4E7",
+            shadowOffset: {width: -1, height:-1},
+            shadowRadius: 4,
+            shadowOpacity: 0.8,
+        }}
+        onPress={() => sheetRef.current.snapTo(1)}>
           <AddIcon />
         </TouchableOpacity>
       </Box>

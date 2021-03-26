@@ -57,16 +57,16 @@ const Top = ( ) => {
         flexDirection='row'
         justifyContent="center" 
         marginTop="m" 
-        width="80%" 
+        width="100%" 
         backgroundColor='white' 
         alignSelf='center'
         style={{ 
-          borderRadius: 5, 
+          borderRadius: 10, 
           padding: 15,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.8,
-          shadowRadius: 2, }}>
+          shadowColor: '#D3D5D8',
+          shadowOffset: { width: 0, height: 7 },
+          shadowOpacity: 0.4,
+          shadowRadius: 3, }}>
         <Box borderRightColor="white" borderRightWidth="1" width='50%'>
           <Text
             textAlign="center"

@@ -1,5 +1,8 @@
 {
   "devToolsPort": 19002,
   "expoServerPort": 19000,
-  "packagerPort": 19000
+  "packagerPort": 19000,
+  "expoServerNgrokUrl": "https://3g-fhx.khchan.react-native-apps-2021.exp.direct",
+  "packagerNgrokUrl": "https://packager.3g-fhx.khchan.react-native-apps-2021.exp.direct",
+  "ngrokPid": 2354
 }
